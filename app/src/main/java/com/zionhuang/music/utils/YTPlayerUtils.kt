@@ -12,6 +12,7 @@ import com.zionhuang.innertube.models.response.PlayerResponse
 import com.zionhuang.music.constants.AudioQuality
 import com.zionhuang.music.db.entities.FormatEntity
 import com.zionhuang.music.utils.potoken.PoTokenGenerator
+import com.zionhuang.music.utils.potoken.PoTokenResult
 import okhttp3.OkHttpClient
 
 object YTPlayerUtils {
@@ -69,7 +70,7 @@ object YTPlayerUtils {
          */
         val signatureTimestamp = getSignatureTimestampOrNull(videoId)
 
-        val (webPlayerPot, webStreamingPot) = poTokenGenerator.getWebClientPoToken(videoId)?.let {
+        val (webPlayerPot, webStreamingPot) = getWebClientPoTokenOrNull(videoId)?.let {
             Pair(it.playerRequestPoToken, it.streamingDataPoToken)
         } ?: Pair(null, null)
 
@@ -125,7 +126,8 @@ object YTPlayerUtils {
                         connectivityManager,
                     ) ?: continue
                 streamUrl = findUrlOrNull(format, videoId) ?: continue
-                streamExpiresInSeconds = streamPlayerResponse.streamingData?.expiresInSeconds ?: continue
+                streamExpiresInSeconds =
+                    streamPlayerResponse.streamingData?.expiresInSeconds ?: continue
 
                 if (client.useWebPoTokens && webStreamingPot != null) {
                     streamUrl += "&pot=$webStreamingPot";
@@ -244,5 +246,17 @@ object YTPlayerUtils {
                 reportException(it)
             }
             .getOrNull()
+    }
+
+    /**
+     * Wrapper around the [PoTokenGenerator.getWebClientPoToken] function which reports exceptions
+     */
+    private fun getWebClientPoTokenOrNull(videoId: String): PoTokenResult? {
+        try {
+            return poTokenGenerator.getWebClientPoToken(videoId)
+        } catch (e: Exception) {
+            reportException(e)
+        }
+        return null
     }
 }
