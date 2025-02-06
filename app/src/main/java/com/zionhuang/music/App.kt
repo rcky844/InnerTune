@@ -14,6 +14,7 @@ import com.zionhuang.kugou.KuGou
 import com.zionhuang.music.constants.ContentCountryKey
 import com.zionhuang.music.constants.ContentLanguageKey
 import com.zionhuang.music.constants.CountryCodeToName
+import com.zionhuang.music.constants.DataSyncIdKey
 import com.zionhuang.music.constants.InnerTubeCookieKey
 import com.zionhuang.music.constants.LanguageCodeToName
 import com.zionhuang.music.constants.MaxImageCacheSizeKey
@@ -92,6 +93,14 @@ class App : Application(), ImageLoaderFactory {
                                 settings[VisitorDataKey] = newVisitorData
                             }
                         } ?: YouTube.DEFAULT_VISITOR_DATA
+                }
+        }
+        GlobalScope.launch {
+            dataStore.data
+                .map { it[DataSyncIdKey] }
+                .distinctUntilChanged()
+                .collect { dataSyncId ->
+                    YouTube.dataSyncId = dataSyncId
                 }
         }
         GlobalScope.launch {
