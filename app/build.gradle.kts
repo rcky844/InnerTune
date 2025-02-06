@@ -168,4 +168,8 @@ dependencies {
     "fullImplementation"(libs.opencc4j)
 
     implementation(libs.timber)
+
+    implementation(libs.nanojson)
+
+    implementation(libs.androidx.webkit)
 }
