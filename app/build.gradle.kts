@@ -169,7 +169,7 @@ dependencies {
 
     implementation(libs.timber)
 
-    implementation(libs.nanojson)
+    implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.androidx.webkit)
 }
