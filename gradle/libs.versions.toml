@@ -93,8 +93,6 @@ mlkit-translate = { group = "com.google.mlkit", name = "translate", version = "1
 
 newpipe-extractor = { group = "com.github.TeamNewPipe", name = "NewPipeExtractor", version = "v0.24.5" }
 
-kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.6.3" }
-
 androidx-webkit = { group = "androidx.webkit", name = "webkit", version = "1.9.0" }
 
 [plugins]
