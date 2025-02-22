@@ -170,6 +170,4 @@ dependencies {
     implementation(libs.timber)
 
     implementation(libs.ktor.serialization.json)
-
-    implementation(libs.androidx.webkit)
 }
