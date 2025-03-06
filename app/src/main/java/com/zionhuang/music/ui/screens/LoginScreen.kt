@@ -95,7 +95,7 @@ fun LoginScreen(
                     @JavascriptInterface
                     fun onRetrieveDataSyncId(newDataSyncId: String?) {
                         if (newDataSyncId != null) {
-                            dataSyncId = newDataSyncId
+                            dataSyncId = newDataSyncId.substringBefore("||")
                         }
                     }
                 }, "Android")
