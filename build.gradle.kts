@@ -31,13 +31,12 @@ tasks.register<Delete>("Clean") {
 
 subprojects {
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-        kotlinOptions {
-            if (project.findProperty("enableComposeCompilerReports") == "true") {
-                arrayOf("reports", "metrics").forEach {
-                    freeCompilerArgs = freeCompilerArgs + listOf(
-                        "-P", "plugin:androidx.compose.compiler.plugins.kotlin:${it}Destination=${project.buildDir.absolutePath}/compose_metrics"
-                    )
-                }
+        if (project.findProperty("enableComposeCompilerReports") == "true") {
+            arrayOf("reports", "metrics").forEach {
+                compilerOptions.freeCompilerArgs.addAll(
+                    "-P",
+                    "plugin:androidx.compose.compiler.plugins.kotlin:${it}Destination=${project.projectDir.toPath()}/compose_metrics",
+                )
             }
         }
     }

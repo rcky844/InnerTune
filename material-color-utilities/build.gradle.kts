@@ -8,6 +8,6 @@ java {
 }
 
 dependencies {
-    compileOnly("com.google.errorprone:error_prone_core:2.16")
+    compileOnly(libs.error.prone.core)
     implementation(libs.annotation)
 }
