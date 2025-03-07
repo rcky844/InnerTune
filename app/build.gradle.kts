@@ -23,7 +23,7 @@ android {
     buildToolsVersion = "35.0.0"
     defaultConfig {
         applicationId = "com.zionhuang.music"
-        minSdk = 24
+        minSdk = 21
         targetSdk = 35
         versionCode = 26
         versionName = "0.5.10"
