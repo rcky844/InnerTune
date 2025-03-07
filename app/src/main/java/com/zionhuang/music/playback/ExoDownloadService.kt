@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Icon
+import android.os.Build
 import androidx.media3.common.util.NotificationUtil
 import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.offline.Download
@@ -42,29 +43,36 @@ class ExoDownloadService : DownloadService(
 
     override fun getScheduler(): Scheduler = PlatformScheduler(this, JOB_ID)
 
-    override fun getForegroundNotification(downloads: MutableList<Download>, notMetRequirements: Int): Notification =
-        Notification.Builder.recoverBuilder(
-            this, downloadUtil.downloadNotificationHelper.buildProgressNotification(
-                this,
-                R.drawable.download,
-                null,
-                if (downloads.size == 1) Util.fromUtf8Bytes(downloads[0].request.data)
-                else resources.getQuantityString(R.plurals.n_song, downloads.size, downloads.size),
-                downloads,
-                notMetRequirements
-            )
-        ).addAction(
-            Notification.Action.Builder(
-                Icon.createWithResource(this, R.drawable.close),
-                getString(android.R.string.cancel),
-                PendingIntent.getService(
-                    this,
-                    0,
-                    Intent(this, ExoDownloadService::class.java).setAction(REMOVE_ALL_PENDING_DOWNLOADS),
-                    PendingIntent.FLAG_IMMUTABLE
-                )
+    override fun getForegroundNotification(downloads: MutableList<Download>, notMetRequirements: Int): Notification {
+        val n = downloadUtil.downloadNotificationHelper.buildProgressNotification(
+            this,
+            R.drawable.download,
+            null,
+            if (downloads.size == 1) Util.fromUtf8Bytes(downloads[0].request.data)
+            else resources.getQuantityString(R.plurals.n_song, downloads.size, downloads.size),
+            downloads,
+            notMetRequirements
+        )
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return Notification.Builder.recoverBuilder(this, n).addAction(
+                Notification.Action.Builder(
+                    Icon.createWithResource(this, R.drawable.close),
+                    getString(android.R.string.cancel),
+                    PendingIntent.getService(
+                        this,
+                        0,
+                        Intent(this, ExoDownloadService::class.java).setAction(REMOVE_ALL_PENDING_DOWNLOADS),
+                        PendingIntent.FLAG_IMMUTABLE
+                    )
+                ).build()
             ).build()
-        ).build()
+        } else {
+            // Return the generic notification for backwards compatibility
+            // The notification created will not lead to anywhere as a result
+            return n
+        }
+    }
 
 
     /**
