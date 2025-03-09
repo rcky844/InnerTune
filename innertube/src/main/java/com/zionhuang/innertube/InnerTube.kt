@@ -206,7 +206,7 @@ class InnerTube {
         ytClient(client)
         setBody(
             GetSearchSuggestionsBody(
-                context = client.toContext(locale, visitorData, dataSyncId),
+                context = client.toContext(locale, visitorData, null),
                 input = input
             )
         )
@@ -220,7 +220,7 @@ class InnerTube {
         ytClient(client)
         setBody(
             GetQueueBody(
-                context = client.toContext(locale, visitorData, dataSyncId),
+                context = client.toContext(locale, visitorData, null),
                 videoIds = videoIds,
                 playlistId = playlistId
             )
