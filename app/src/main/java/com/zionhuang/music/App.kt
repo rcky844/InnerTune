@@ -58,6 +58,9 @@ class App : Application(), ImageLoaderFactory {
         )
         if (languageTag == "zh-TW") {
             KuGou.useTraditionalChinese = true
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                KuGou.targetSupportsUnicodeScript = true
+            }
         }
 
         if (dataStore[ProxyEnabledKey] == true) {

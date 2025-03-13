@@ -180,6 +180,7 @@ object KuGou {
             else it
         }
 
+    @Suppress("NewApi")
     private fun String.normalizeForTraditionalChinese() =
         if (none { c -> UnicodeScript.of(c.code) in JapaneseUnicodeScript }) toTraditionalChinese()
             .replace('着', '著')
@@ -193,10 +194,16 @@ object KuGou {
     private val ACCEPTED_REGEX = "\\[(\\d\\d):(\\d\\d)\\.(\\d{2,3})\\].*".toRegex()
     private val BANNED_REGEX = ".+].+[:：].+".toRegex()
 
-    private val JapaneseUnicodeScript = hashSetOf(
-        UnicodeScript.HIRAGANA,
-        UnicodeScript.KATAKANA,
-    )
+    @Suppress("NewApi")
+    var targetSupportsUnicodeScript = false
+        set(value) {
+            field = value
+            JapaneseUnicodeScript = if (value) hashSetOf(
+                UnicodeScript.HIRAGANA,
+                UnicodeScript.KATAKANA,
+            ) else hashSetOf()
+        }
+    private var JapaneseUnicodeScript = hashSetOf<UnicodeScript>()
 
     private const val DURATION_TOLERANCE = 8
 }
