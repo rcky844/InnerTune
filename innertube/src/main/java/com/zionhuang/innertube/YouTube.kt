@@ -50,6 +50,7 @@ import io.ktor.client.call.body
 import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
 import java.net.Proxy
@@ -533,7 +534,11 @@ object YouTube {
         Json.parseToJsonElement(innerTube.getSwJsData().bodyAsText().substring(5))
             .jsonArray[0]
             .jsonArray[2]
-            .jsonArray.first { (it as? JsonPrimitive)?.content?.startsWith(VISITOR_DATA_PREFIX) == true }
+            .jsonArray.first {
+                (it as? JsonPrimitive)?.contentOrNull?.let { candidate ->
+                    VISITOR_DATA_REGEX.containsMatchIn(candidate)
+                } ?: false
+            }
             .jsonPrimitive.content
     }
 
@@ -558,5 +563,5 @@ object YouTube {
 
     const val MAX_GET_QUEUE_SIZE = 1000
 
-    private const val VISITOR_DATA_PREFIX = "Cgt"
+    private val VISITOR_DATA_REGEX = Regex("^Cg[t|s]")
 }
