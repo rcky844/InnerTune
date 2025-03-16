@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
+import com.zionhuang.innertube.YouTube
 import com.zionhuang.innertube.utils.parseCookieString
 import com.zionhuang.music.LocalPlayerAwareWindowInsets
 import com.zionhuang.music.R
@@ -42,6 +43,7 @@ import com.zionhuang.music.constants.ProxyEnabledKey
 import com.zionhuang.music.constants.ProxyTypeKey
 import com.zionhuang.music.constants.ProxyUrlKey
 import com.zionhuang.music.constants.SYSTEM_DEFAULT
+import com.zionhuang.music.constants.UseLoginForBrowse
 import com.zionhuang.music.constants.VisitorDataKey
 import com.zionhuang.music.ui.component.EditTextPreference
 import com.zionhuang.music.ui.component.IconButton
@@ -69,6 +71,7 @@ fun ContentSettings(
     val isLoggedIn = remember(innerTubeCookie) {
         "SAPISID" in parseCookieString(innerTubeCookie)
     }
+    val (useLoginForBrowse, onUseLoginForBrowseChange) = rememberPreference(key = UseLoginForBrowse, defaultValue = false)
     val (contentLanguage, onContentLanguageChange) = rememberPreference(key = ContentLanguageKey, defaultValue = "system")
     val (contentCountry, onContentCountryChange) = rememberPreference(key = ContentCountryKey, defaultValue = "system")
     val (hideExplicit, onHideExplicitChange) = rememberPreference(key = HideExplicitKey, defaultValue = false)
@@ -122,6 +125,17 @@ fun ContentSettings(
                         Text(stringResource(R.string.login))
                     }
                 }
+            }
+        )
+
+        SwitchPreference(
+            title = { Text(stringResource(R.string.use_login_for_browse)) },
+            description = stringResource(R.string.use_login_for_browse_desc),
+            icon = { Icon(painterResource(R.drawable.person), null) },
+            checked = useLoginForBrowse,
+            onCheckedChange = {
+                YouTube.useLoginForBrowse = it
+                onUseLoginForBrowseChange(it)
             }
         )
 

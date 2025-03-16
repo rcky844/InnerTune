@@ -50,7 +50,6 @@ fun PrivacySettings(
     val database = LocalDatabase.current
     val (pauseListenHistory, onPauseListenHistoryChange) = rememberPreference(key = PauseListenHistoryKey, defaultValue = false)
     val (pauseSearchHistory, onPauseSearchHistoryChange) = rememberPreference(key = PauseSearchHistoryKey, defaultValue = false)
-    val (useLoginForBrowse, onUseLoginForBrowseChange) = rememberPreference(key = UseLoginForBrowse, defaultValue = false)
     val (disableScreenshot, onDisableScreenshotChange) = rememberPreference(key = DisableScreenshotKey, defaultValue = false)
 
     var showClearListenHistoryDialog by remember { mutableStateOf(false) }
@@ -156,21 +155,6 @@ fun PrivacySettings(
             title = { Text(stringResource(R.string.clear_search_history)) },
             icon = { Icon(painterResource(R.drawable.clear_all), null) },
             onClick = { showClearSearchHistoryDialog = true }
-        )
-
-        PreferenceGroupTitle(
-            title = stringResource(R.string.account)
-        )
-
-        SwitchPreference(
-            title = { Text(stringResource(R.string.use_login_for_browse)) },
-            description = stringResource(R.string.use_login_for_browse_desc),
-            icon = { Icon(painterResource(R.drawable.person), null) },
-            checked = useLoginForBrowse,
-            onCheckedChange = {
-                YouTube.useLoginForBrowse = it
-                onUseLoginForBrowseChange(it)
-            }
         )
 
         PreferenceGroupTitle(
