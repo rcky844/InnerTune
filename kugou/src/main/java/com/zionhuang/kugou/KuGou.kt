@@ -166,7 +166,7 @@ object KuGou {
             }
             it.dropLast(tailCutLine)
         }.takeIf {
-            it.isNotEmpty() && "纯音乐，请欣赏" !in it[0]
+            it.isNotEmpty() && "纯音乐，请欣赏" !in it[0] && "酷狗音乐  就是歌多" !in it[0]
         }?.let { lines ->
             val firstLine = lines.firstOrNull()?.toSimplifiedChinese() ?: return@let lines
             val (title, artist) = keyword
