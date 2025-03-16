@@ -79,7 +79,7 @@ class App : Application(), ImageLoaderFactory {
             }
         }
 
-        if (dataStore[UseLoginForBrowse] == true) {
+        if (dataStore[UseLoginForBrowse] != false) {
             YouTube.useLoginForBrowse = true
         }
 
