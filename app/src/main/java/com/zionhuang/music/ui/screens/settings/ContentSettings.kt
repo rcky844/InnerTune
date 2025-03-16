@@ -10,13 +10,16 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
@@ -29,6 +32,7 @@ import com.zionhuang.music.constants.AccountNameKey
 import com.zionhuang.music.constants.ContentCountryKey
 import com.zionhuang.music.constants.ContentLanguageKey
 import com.zionhuang.music.constants.CountryCodeToName
+import com.zionhuang.music.constants.DataSyncIdKey
 import com.zionhuang.music.constants.EnableKugouKey
 import com.zionhuang.music.constants.EnableLrcLibKey
 import com.zionhuang.music.constants.HideExplicitKey
@@ -38,6 +42,7 @@ import com.zionhuang.music.constants.ProxyEnabledKey
 import com.zionhuang.music.constants.ProxyTypeKey
 import com.zionhuang.music.constants.ProxyUrlKey
 import com.zionhuang.music.constants.SYSTEM_DEFAULT
+import com.zionhuang.music.constants.VisitorDataKey
 import com.zionhuang.music.ui.component.EditTextPreference
 import com.zionhuang.music.ui.component.IconButton
 import com.zionhuang.music.ui.component.ListPreference
@@ -55,10 +60,12 @@ fun ContentSettings(
     navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior,
 ) {
-    val accountName by rememberPreference(AccountNameKey, "")
-    val accountEmail by rememberPreference(AccountEmailKey, "")
-    val accountChannelHandle by rememberPreference(AccountChannelHandleKey, "")
-    val innerTubeCookie by rememberPreference(InnerTubeCookieKey, "")
+    var accountName by rememberPreference(AccountNameKey, "")
+    var accountEmail by rememberPreference(AccountEmailKey, "")
+    var accountChannelHandle by rememberPreference(AccountChannelHandleKey, "")
+    var visitorData by rememberPreference(VisitorDataKey, "")
+    var dataSyncId by rememberPreference(DataSyncIdKey, "")
+    var innerTubeCookie by rememberPreference(InnerTubeCookieKey, "")
     val isLoggedIn = remember(innerTubeCookie) {
         "SAPISID" in parseCookieString(innerTubeCookie)
     }
@@ -80,15 +87,48 @@ fun ContentSettings(
     ) {
         Spacer(Modifier.windowInsetsPadding(LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Top)))
 
+        PreferenceGroupTitle(
+            title = stringResource(R.string.account)
+        )
+
         PreferenceEntry(
-            title = { Text(if (isLoggedIn) accountName else stringResource(R.string.login)) },
+            title = {
+                Text(
+                    text = if (isLoggedIn) accountName else stringResource(R.string.not_logged_in),
+                    modifier = Modifier.alpha(if (isLoggedIn) 1f else 0.5f)
+                )
+            },
             description = if (isLoggedIn) {
                 accountEmail.takeIf { it.isNotEmpty() }
                     ?: accountChannelHandle.takeIf { it.isNotEmpty() }
             } else null,
             icon = { Icon(painterResource(R.drawable.person), null) },
-            onClick = { navController.navigate("login") }
+            trailingContent = {
+                if (isLoggedIn) {
+                    OutlinedButton(onClick = {
+                        accountName = ""
+                        accountEmail = ""
+                        accountChannelHandle = ""
+                        innerTubeCookie = ""
+                        visitorData = ""
+                        dataSyncId = ""
+                    }) {
+                        Text(stringResource(R.string.logout))
+                    }
+                } else {
+                    OutlinedButton(onClick = {
+                        navController.navigate("login")
+                    }) {
+                        Text(stringResource(R.string.login))
+                    }
+                }
+            }
         )
+
+        PreferenceGroupTitle(
+            title = stringResource(R.string.options)
+        )
+
         ListPreference(
             title = { Text(stringResource(R.string.content_language)) },
             icon = { Icon(painterResource(R.drawable.language), null) },
