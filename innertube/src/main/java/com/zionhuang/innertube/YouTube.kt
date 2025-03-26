@@ -17,6 +17,7 @@ import com.zionhuang.innertube.models.YouTubeClient.Companion.WEB
 import com.zionhuang.innertube.models.YouTubeClient.Companion.WEB_REMIX
 import com.zionhuang.innertube.models.YouTubeLocale
 import com.zionhuang.innertube.models.getContinuation
+import com.zionhuang.innertube.models.getItems
 import com.zionhuang.innertube.models.oddElements
 import com.zionhuang.innertube.models.response.AccountMenuResponse
 import com.zionhuang.innertube.models.response.BrowseResponse
@@ -125,9 +126,9 @@ object YouTube {
                 else
                     SearchSummary(
                         title = it.musicShelfRenderer?.title?.runs?.firstOrNull()?.text ?: return@mapNotNull null,
-                        items = it.musicShelfRenderer.contents
+                        items = it.musicShelfRenderer.contents?.getItems()
                             ?.mapNotNull {
-                                SearchSummaryPage.fromMusicResponsiveListItemRenderer(it.musicResponsiveListItemRenderer)
+                                SearchSummaryPage.fromMusicResponsiveListItemRenderer(it)
                             }
                             ?.distinctBy { it.id }
                             ?.ifEmpty { null } ?: return@mapNotNull null
@@ -141,12 +142,12 @@ object YouTube {
         SearchResult(
             items = response.contents?.tabbedSearchResultsRenderer?.tabs?.firstOrNull()
                 ?.tabRenderer?.content?.sectionListRenderer?.contents?.lastOrNull()
-                ?.musicShelfRenderer?.contents?.mapNotNull {
-                    SearchPage.toYTItem(it.musicResponsiveListItemRenderer)
+                ?.musicShelfRenderer?.contents?.getItems()?.mapNotNull {
+                    SearchPage.toYTItem(it)
                 }.orEmpty(),
             continuation = response.contents?.tabbedSearchResultsRenderer?.tabs?.firstOrNull()
                 ?.tabRenderer?.content?.sectionListRenderer?.contents?.lastOrNull()
-                ?.musicShelfRenderer?.continuations?.getContinuation()
+                ?.musicShelfRenderer?.contents?.getContinuation()
         )
     }
 
@@ -191,20 +192,20 @@ object YouTube {
         val songs = response.contents?.twoColumnBrowseResultsRenderer
             ?.secondaryContents?.sectionListRenderer
             ?.contents?.firstOrNull()
-            ?.musicPlaylistShelfRenderer?.contents
+            ?.musicPlaylistShelfRenderer?.contents?.getItems()
             ?.mapNotNull {
-                AlbumPage.fromMusicResponsiveListItemRenderer(it.musicResponsiveListItemRenderer)
+                AlbumPage.fromMusicResponsiveListItemRenderer(it)
             }!!
             .toMutableList()
         var continuation = response.contents?.twoColumnBrowseResultsRenderer?.secondaryContents?.sectionListRenderer
-            ?.contents?.firstOrNull()?.musicPlaylistShelfRenderer?.continuations?.getContinuation()
+            ?.contents?.firstOrNull()?.musicPlaylistShelfRenderer?.contents?.getContinuation()
         while (continuation != null) {
             response = innerTube.browse(
                 client = WEB_REMIX,
                 continuation = continuation,
             ).body<BrowseResponse>()
-            songs += response.continuationContents?.musicPlaylistShelfContinuation?.contents?.mapNotNull {
-                AlbumPage.fromMusicResponsiveListItemRenderer(it.musicResponsiveListItemRenderer)
+            songs += response.continuationContents?.musicPlaylistShelfContinuation?.contents?.getItems()?.mapNotNull {
+                AlbumPage.fromMusicResponsiveListItemRenderer(it)
             }.orEmpty()
             continuation = response.continuationContents?.musicPlaylistShelfContinuation?.continuations?.getContinuation()
         }
@@ -250,12 +251,12 @@ object YouTube {
                 title = response.header?.musicHeaderRenderer?.title?.runs?.firstOrNull()?.text!!,
                 items = response.contents?.singleColumnBrowseResultsRenderer?.tabs?.firstOrNull()
                     ?.tabRenderer?.content?.sectionListRenderer?.contents?.firstOrNull()
-                    ?.musicPlaylistShelfRenderer?.contents?.mapNotNull {
-                        ArtistItemsPage.fromMusicResponsiveListItemRenderer(it.musicResponsiveListItemRenderer)
+                    ?.musicPlaylistShelfRenderer?.contents?.getItems()?.mapNotNull {
+                        ArtistItemsPage.fromMusicResponsiveListItemRenderer(it)
                     }!!,
                 continuation = response.contents.singleColumnBrowseResultsRenderer.tabs.firstOrNull()
                     ?.tabRenderer?.content?.sectionListRenderer?.contents?.firstOrNull()
-                    ?.musicPlaylistShelfRenderer?.continuations?.getContinuation()
+                    ?.musicPlaylistShelfRenderer?.contents?.getContinuation()
             )
         }
     }
@@ -274,8 +275,8 @@ object YouTube {
             )
         } else {
             ArtistItemsContinuationPage(
-                items = response.continuationContents?.musicPlaylistShelfContinuation?.contents?.mapNotNull {
-                    ArtistItemsPage.fromMusicResponsiveListItemRenderer(it.musicResponsiveListItemRenderer)
+                items = response.continuationContents?.musicPlaylistShelfContinuation?.contents?.getItems()?.mapNotNull {
+                    ArtistItemsPage.fromMusicResponsiveListItemRenderer(it)
                 }!!,
                 continuation = response.continuationContents.musicPlaylistShelfContinuation.continuations?.getContinuation()
             )
@@ -309,12 +310,12 @@ object YouTube {
                 }?.menuNavigationItemRenderer?.navigationEndpoint?.watchPlaylistEndpoint!!
             ),
             songs = response.contents?.twoColumnBrowseResultsRenderer?.secondaryContents?.sectionListRenderer?.contents
-                ?.firstOrNull()?.musicPlaylistShelfRenderer?.contents?.mapNotNull {
-                    PlaylistPage.fromMusicResponsiveListItemRenderer(it.musicResponsiveListItemRenderer)
+                ?.firstOrNull()?.musicPlaylistShelfRenderer?.contents?.getItems()?.mapNotNull {
+                    PlaylistPage.fromMusicResponsiveListItemRenderer(it)
                 }!!,
             songsContinuation = response.contents.twoColumnBrowseResultsRenderer.secondaryContents.sectionListRenderer
                 .contents.firstOrNull()
-                ?.musicPlaylistShelfRenderer?.continuations?.getContinuation(),
+                ?.musicPlaylistShelfRenderer?.contents?.getContinuation(),
             continuation = response.contents.twoColumnBrowseResultsRenderer.secondaryContents.sectionListRenderer
                 .continuations?.getContinuation()
         )
@@ -327,8 +328,8 @@ object YouTube {
             setLogin = true
         ).body<BrowseResponse>()
         PlaylistContinuationPage(
-            songs = response.continuationContents?.musicPlaylistShelfContinuation?.contents?.mapNotNull {
-                PlaylistPage.fromMusicResponsiveListItemRenderer(it.musicResponsiveListItemRenderer)
+            songs = response.continuationContents?.musicPlaylistShelfContinuation?.contents?.getItems()?.mapNotNull {
+                PlaylistPage.fromMusicResponsiveListItemRenderer(it)
             }!!,
             continuation = response.continuationContents.musicPlaylistShelfContinuation.continuations?.getContinuation()
         )
